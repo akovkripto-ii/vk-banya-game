@@ -24,34 +24,56 @@
             position: relative;
         }
 
-        /* Фон бани (ВОЗВРАЩАЕМ ВНЕШНЮЮ КАРТИНКУ ДЛЯ ВИЗУАЛА) */
+        /* 1. ФОН БАНИ И ПЕЧЬ (НОВЫЙ CSS-ДИЗАЙН ДЛЯ НАДЕЖНОСТИ) */
         #banya-interior {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Внешняя картинка. Если не работает, проблема в блокировке ссылок. */
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)), 
-                        url('https://images.pexels.com/photos/27972232/pexels-photo-27972232/free-photo-of-a-wooden-sauna-with-logs-and-benches.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') center / cover no-repeat fixed;
+            /* Темный градиент + текстура дерева (для надежности) */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8)),
+                        repeating-linear-gradient(90deg, #3e2723 0, #3e2723 40px, #2b1d16 40px, #2b1d16 80px);
             z-index: 0;
-            filter: brightness(0.8);
         }
         
-        /* Девушка (SVG ВСТРОЕН В КОД - ГАРАНТИЯ ОТОБРАЖЕНИЯ) */
-        #banya-girl {
+        /* Нижние полки (Лавки) */
+        #banya-interior::after {
+            content: '';
             position: absolute;
-            bottom: 15%; 
+            bottom: 0; left: 0; width: 100%; height: 25%; /* Снижаем высоту, чтобы не мешало венику */
+            background: linear-gradient(to right, #4e342e 0%, #3e2723 100%);
+            border-top: 10px solid #5d4037;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* Печь (визуализация) */
+        #pech {
+            content: '';
+            position: absolute;
+            bottom: 10%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 300px;
-            height: 200px;
-            /* Силуэт девушки лежащей на полке */
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 150'%3E%3Cpath fill='%23d7ccc8' d='M20,130 Q50,110 80,120 Q110,130 140,115 Q170,100 220,110 Q260,120 280,140 L280,150 L20,150 Z' opacity='0.9'/%3E%3Ccircle cx='250' cy='100' r='15' fill='%23d7ccc8' opacity='0.9'/%3E%3Cpath fill='%23ef5350' d='M70,120 Q100,125 130,115 L135,125 Q100,140 70,130 Z' opacity='0.8' /%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: center bottom;
-            background-size: contain;
-            opacity: 0.9;
+            width: 150px;
+            height: 100px;
+            background: #546e7a; /* Серый металл */
+            border: 5px solid #455a64;
+            border-radius: 5px 5px 0 0;
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.5); /* Жар */
             z-index: 1;
-            pointer-events: none;
+            /* Камни на печи */
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 5px;
         }
+        #pech::before, #pech::after {
+            content: '';
+            width: 25px; height: 25px;
+            background: #37474f; /* Камни */
+            border-radius: 50%;
+            display: block;
+        }
+        #pech::before { transform: translate(-30px, 0); }
+        #pech::after { transform: translate(30px, 0); }
+
 
         /* Фоновый пар */
         .steam-bg {
@@ -92,7 +114,7 @@
         }
         #timer { font-size: 48px; font-weight: bold; color: #fff; display: block; }
 
-        /* Градусник */
+        /* Градусник (без изменений) */
         #thermometer-container {
             width: 60px;
             height: 40%; 
@@ -134,18 +156,16 @@
             z-index: 0;
         }
 
-        /* Кнопка */
-        #btn {
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #ff5722 0%, #bf360c 100%);
-            border: 5px solid #ffab91;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            text-transform: uppercase;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        /* 2. СТИЛЬ ВЕНИКА (Вместо кнопки #btn) */
+        #venik-btn {
+            width: 150px; 
+            height: 150px;
+            /* Встроенный SVG-веник Base64 */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='leafGradient' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%234CAF50;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%23388E3C;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M 50 15 L 75 30 L 70 50 L 50 45 L 30 50 L 25 30 Z' fill='url(%23leafGradient)'/%3E%3Cpath d='M 50 15 L 65 5 L 60 25 L 50 20 L 40 25 L 35 5 Z' fill='url(%23leafGradient)'/%3E%3Cpath d='M 50 45 L 70 65 L 60 85 L 50 75 L 40 85 L 30 65 Z' fill='url(%23leafGradient)'/%3E%3Crect x='45' y='75' width='10' height='20' rx='5' ry='5' fill='%23795548'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border: none;
             cursor: pointer;
             outline: none;
             user-select: none;
@@ -153,11 +173,14 @@
             position: relative;
             z-index: 6;
             touch-action: none; 
-            transition: transform 0.05s;
+            transition: transform 0.05s, filter 0.05s;
         }
-        #btn:active { transform: scale(0.92); filter: brightness(1.1); }
+        #venik-btn:active { 
+            transform: scale(0.92) rotate(-10deg); /* Эффект удара */
+            filter: brightness(1.2); 
+        }
 
-        /* СТИЛЬ ПАРА */
+        /* СТИЛЬ ПАРА (С ШИРОКИМ РАЗЛЕТОМ) */
         .steam-burst {
             position: absolute;
             bottom: 60%;
@@ -170,15 +193,18 @@
             animation: burstFadeOut 1.5s forwards;
             pointer-events: none;
             z-index: 4;
+            /* Используется в JS для разброса */
             --x: 0px; 
+            --y: 0px;
         }
         
         @keyframes burstFadeOut {
-            0% { transform: translate(-50%, 0) scale(0.2); opacity: 0.9; }
-            100% { transform: translate(calc(-50% + var(--x)), -350px) scale(3); opacity: 0; }
+            /* 4. РАЗБРОС ПАРА: Летит выше и шире (-350px по Y, +-200px по X) */
+            0% { transform: translate(calc(-50% + var(--x)), 0) scale(0.2); opacity: 0.9; }
+            100% { transform: translate(calc(-50% + var(--x)), -400px) scale(3); opacity: 0; }
         }
 
-        /* Оверлеи */
+        /* Оверлеи (без изменений) */
         #start-overlay, #result-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); 
@@ -202,20 +228,15 @@
 </head>
 <body>
 
-    <audio id="bg-music" loop>
-        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=meditation-impulse-3011.mp3" type="audio/mpeg">
-    </audio>
-
     <div id="banya-interior"></div>
-    <div id="banya-girl"></div> 
-    <div class="steam-bg"></div>
+    <div id="pech"></div> <div class="steam-bg"></div>
 
     <div id="start-overlay">
         <p style="color:#bbb; font-size:16px; letter-spacing: 2px;">ВИРТУАЛЬНАЯ ПАРНАЯ</p>
         <h1 style="color:#ffab91; font-size:36px; margin: 10px 0 30px;">🔥 ЧЕЛЛЕНДЖ 90°C</h1>
         <p style="color:#fff; font-size:18px; line-height: 1.6; max-width: 300px;">
             Твоя задача — удержать температуру в <b>ЗЕЛЕНОЙ ЗОНЕ</b>.<br><br>
-            Жми кнопку, чтобы поддать жару!
+            **ТЫКАЙ ВЕНИКОМ** по экрану, чтобы поддать жару!
         </p>
         <button id="start-button" class="action-btn" style="background: #4caf50; margin-top: 40px;">
             НАЧАТЬ ИГРУ
@@ -223,14 +244,14 @@
     </div>
 
     <div id="game-ui">
-        <div id="timer-box">Время: <span id="timer">30</span></div>
+        <div id="timer-box">Время: <span id="timer">20</span></div>
 
         <div id="thermometer-container">
             <div id="green-zone"></div>
             <div id="mercury"></div>
         </div>
 
-        <button id="btn">ПОДДАТЬ<br>ПАРУ!</button>
+        <div id="venik-btn"></div> 
     </div>
 
     <div id="result-screen">
@@ -255,18 +276,19 @@
         // --- ПЕРЕМЕННЫЕ ---
         const mercury = document.getElementById('mercury');
         const timerEl = document.getElementById('timer');
-        const btn = document.getElementById('btn');
-        const bgMusic = document.getElementById('bg-music');
+        // ССЫЛКА НА НОВЫЙ ЭЛЕМЕНТ ВЕНИКА
+        const venikBtn = document.getElementById('venik-btn'); 
+        // const bgMusic = document.getElementById('bg-music'); // УДАЛЕНА
         const startOverlay = document.getElementById('start-overlay');
         const startButton = document.getElementById('start-button');
         
         let heat = 0; 
         let isAddingHeat = false;
         let isRunning = false;
-        let timeLeft = 30;
+        let timeLeft = 20; // 3. ТАЙМЕР ИЗМЕНЕН НА 20 СЕКУНД
         let scoreTime = 0; 
         let countdownId;
-        let bgMusicPlayed = false; // Флаг для фоновой музыки
+        // let bgMusicPlayed = false; // УДАЛЕНА
 
         // --- АУДИО КОНТЕКСТ (Шум пара) ---
         let audioCtx;
@@ -308,7 +330,6 @@
         }
 
         function playSteamSound() {
-            // ЭТОТ ЗВУК ПАРА ЗАПУСКАЕТСЯ С КЛИКА КНОПКИ (ДОЛЖЕН РАБОТАТЬ НА iOS)
             if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             if(gainNode) gainNode.gain.setTargetAtTime(0.3, audioCtx.currentTime, 0.05);
         }
@@ -332,11 +353,12 @@
         function startGame() {
             if (isRunning) return;
             
-            // ПРИНУДИТЕЛЬНЫЙ ЗАПУСК АУДИОКОНТЕКСТА НА СТАРТОВОЙ КНОПКЕ
             initAudio(); 
             
             startOverlay.style.display = 'none';
             isRunning = true;
+            timeLeft = 20; // Убедимся, что таймер начинается с 20
+            timerEl.innerText = timeLeft;
 
             countdownId = setInterval(() => {
                 timeLeft--;
@@ -377,9 +399,9 @@
             isRunning = false;
             clearInterval(countdownId);
             stopSteamSound();
-            if(bgMusic) bgMusic.pause();
 
-            const percent = Math.round((scoreTime / 30) * 100);
+            // Расчет на 20 секунд
+            const percent = Math.round((scoreTime / 20) * 100); 
             
             let title, desc;
             if (percent > 80) {
@@ -403,14 +425,8 @@
             
             if (!isRunning) return;
             
-            // ПОПЫТКА ЗАПУСТИТЬ ФОНОВУЮ МУЗЫКУ ЗДЕСЬ (НА КНОПКЕ)
-            if (!bgMusicPlayed) {
-                if(bgMusic) bgMusic.play().catch(e => console.log("BG Music still blocked"));
-                bgMusicPlayed = true;
-            }
-
             isAddingHeat = true;
-            btn.style.transform = "scale(0.95)";
+            venikBtn.style.transform = "scale(0.92) rotate(-10deg)"; // Новое имя элемента
             
             playSteamSound();
             createSteamBurst();
@@ -420,39 +436,41 @@
         const stopHeat = (e) => {
             if(e.cancelable) e.preventDefault();
             isAddingHeat = false;
-            btn.style.transform = "scale(1)";
+            venikBtn.style.transform = "scale(1)"; // Новое имя элемента
             stopSteamSound();
         };
 
         // Слушатели событий
         startButton.addEventListener('click', startGame);
 
-        btn.addEventListener('mousedown', startHeat);
-        btn.addEventListener('touchstart', startHeat, {passive: false}); 
+        // Привязываем события к НОВОМУ ЭЛЕМЕНТУ venikBtn
+        venikBtn.addEventListener('mousedown', startHeat);
+        venikBtn.addEventListener('touchstart', startHeat, {passive: false}); 
         
-        btn.addEventListener('mouseup', stopHeat);
-        btn.addEventListener('touchend', stopHeat, {passive: false});
-        btn.addEventListener('mouseleave', stopHeat);
+        venikBtn.addEventListener('mouseup', stopHeat);
+        venikBtn.addEventListener('touchend', stopHeat, {passive: false});
+        venikBtn.addEventListener('mouseleave', stopHeat);
 
-        // --- ГЕНЕРАЦИЯ ПАРА ---
+        // --- ГЕНЕРАЦИЯ ПАРА (УСИЛЕННЫЙ РАЗБРОС) ---
         function createSteamBurst() {
-            for (let i = 0; i < 15; i++) {
+            for (let i = 0; i < 20; i++) { // Увеличиваем количество частиц
                 setTimeout(() => {
                     const burst = document.createElement('div');
                     burst.classList.add('steam-burst');
                     
-                    const randomX = (Math.random() * 300 - 150); 
+                    // 4. ШИРОКИЙ РАЗБРОС: от -250px до +250px
+                    const randomX = (Math.random() * 500 - 250); 
                     burst.style.setProperty('--x', randomX + 'px');
                     
                     const size = 60 + Math.random() * 80;
                     burst.style.width = size + 'px';
                     burst.style.height = size + 'px';
-                    burst.style.animationDuration = (0.8 + Math.random()) + 's';
+                    burst.style.animationDuration = (0.8 + Math.random() * 0.5) + 's';
 
-                    btn.appendChild(burst);
+                    venikBtn.appendChild(burst); // Прикрепляем к венику
                     
                     burst.addEventListener('animationend', () => { burst.remove(); });
-                }, i * 20);
+                }, i * 15);
             }
         }
 
