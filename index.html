@@ -24,26 +24,17 @@
             position: relative;
         }
 
-        /* Фон бани (Встроенный SVG для надежности) */
+        /* Фон бани (ВОЗВРАЩАЕМ ВНЕШНЮЮ КАРТИНКУ ДЛЯ ВИЗУАЛА) */
         #banya-interior {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Темный градиент + текстура дерева */
-            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8)),
-                        repeating-linear-gradient(90deg, #3e2723 0, #3e2723 40px, #2b1d16 40px, #2b1d16 80px);
+            /* Внешняя картинка. Если не работает, проблема в блокировке ссылок. */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)), 
+                        url('https://images.pexels.com/photos/27972232/pexels-photo-27972232/free-photo-of-a-wooden-sauna-with-logs-and-benches.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') center / cover no-repeat fixed;
             z-index: 0;
+            filter: brightness(0.8);
         }
         
-        /* Печь и полки (Рисуем CSS/SVG, чтобы не зависеть от картинок) */
-        #banya-interior::after {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 40%;
-            background: linear-gradient(to right, #4e342e 0%, #3e2723 100%);
-            border-top: 10px solid #5d4037;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-        }
-
         /* Девушка (SVG ВСТРОЕН В КОД - ГАРАНТИЯ ОТОБРАЖЕНИЯ) */
         #banya-girl {
             position: absolute;
@@ -94,7 +85,7 @@
             font-size: 24px;
             color: #ffcc80;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            margin-top: 40px; /* Отступ сверху для челки телефона */
+            margin-top: 40px;
             background: rgba(0,0,0,0.6);
             padding: 5px 20px;
             border-radius: 15px;
@@ -104,7 +95,7 @@
         /* Градусник */
         #thermometer-container {
             width: 60px;
-            height: 40%; /* Адаптивная высота */
+            height: 40%; 
             max-height: 350px;
             background: #3e2723;
             border-radius: 30px;
@@ -161,12 +152,12 @@
             margin-bottom: 30px;
             position: relative;
             z-index: 6;
-            touch-action: none; /* Важно для мобильных */
+            touch-action: none; 
             transition: transform 0.05s;
         }
         #btn:active { transform: scale(0.92); filter: brightness(1.1); }
 
-        /* СТИЛЬ ПАРА (ИСПРАВЛЕН РАЗЛЕТ) */
+        /* СТИЛЬ ПАРА */
         .steam-burst {
             position: absolute;
             bottom: 60%;
@@ -178,7 +169,7 @@
             transform: translate(-50%, 0) scale(0.1);
             animation: burstFadeOut 1.5s forwards;
             pointer-events: none;
-            z-index: 4; /* Под кнопкой, но над фоном */
+            z-index: 4;
             --x: 0px; 
         }
         
@@ -187,7 +178,7 @@
             100% { transform: translate(calc(-50% + var(--x)), -350px) scale(3); opacity: 0; }
         }
 
-        /* Оверлеи (Старт и Результат) */
+        /* Оверлеи */
         #start-overlay, #result-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); 
@@ -219,16 +210,16 @@
     <div id="banya-girl"></div> 
     <div class="steam-bg"></div>
 
-    <div id="start-overlay" onclick="startGame()">
+    <div id="start-overlay">
         <p style="color:#bbb; font-size:16px; letter-spacing: 2px;">ВИРТУАЛЬНАЯ ПАРНАЯ</p>
         <h1 style="color:#ffab91; font-size:36px; margin: 10px 0 30px;">🔥 ЧЕЛЛЕНДЖ 90°C</h1>
         <p style="color:#fff; font-size:18px; line-height: 1.6; max-width: 300px;">
             Твоя задача — удержать температуру в <b>ЗЕЛЕНОЙ ЗОНЕ</b>.<br><br>
             Жми кнопку, чтобы поддать жару!
         </p>
-        <div style="margin-top:40px; color:#4caf50; font-weight:bold; font-size:20px; animation: pulseSteam 1s infinite;">
-            КОСНИСЬ ЭКРАНА, ЧТОБЫ НАЧАТЬ
-        </div>
+        <button id="start-button" class="action-btn" style="background: #4caf50; margin-top: 40px;">
+            НАЧАТЬ ИГРУ
+        </button>
     </div>
 
     <div id="game-ui">
@@ -255,7 +246,7 @@
     </div>
 
     <script>
-        // Инициализация VK Bridge (для вибрации и работы в приложении)
+        // Инициализация VK Bridge 
         const bridge = window.vkBridge;
         if(bridge) {
             bridge.send('VKWebAppInit');
@@ -266,6 +257,8 @@
         const timerEl = document.getElementById('timer');
         const btn = document.getElementById('btn');
         const bgMusic = document.getElementById('bg-music');
+        const startOverlay = document.getElementById('start-overlay');
+        const startButton = document.getElementById('start-button');
         
         let heat = 0; 
         let isAddingHeat = false;
@@ -273,21 +266,19 @@
         let timeLeft = 30;
         let scoreTime = 0; 
         let countdownId;
+        let bgMusicPlayed = false; // Флаг для фоновой музыки
 
         // --- АУДИО КОНТЕКСТ (Шум пара) ---
         let audioCtx;
         let noiseNode;
         let gainNode;
 
-        // Создаем аудио контекст (для мобильных важно создавать его внутри функции)
         function initAudio() {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!audioCtx) {
                     audioCtx = new AudioContext();
                 }
-                
-                // Если контекст "спит" (обычно на iOS), будим его
                 if (audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
@@ -317,6 +308,7 @@
         }
 
         function playSteamSound() {
+            // ЭТОТ ЗВУК ПАРА ЗАПУСКАЕТСЯ С КЛИКА КНОПКИ (ДОЛЖЕН РАБОТАТЬ НА iOS)
             if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             if(gainNode) gainNode.gain.setTargetAtTime(0.3, audioCtx.currentTime, 0.05);
         }
@@ -325,17 +317,13 @@
             if(gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
         }
 
-        // --- ВИБРАЦИЯ (УНИВЕРСАЛЬНАЯ) ---
         function triggerVibration() {
-            // 1. Пробуем нативную вибрацию VK (для iOS/Android внутри ВК)
             if (bridge) {
                 bridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"})
                     .catch(() => {
-                        // Если не сработало, пробуем обычную вибрацию браузера
                         if (navigator.vibrate) navigator.vibrate(30);
                     });
             } else {
-                // Если мы не в ВК, просто вибрируем
                 if (navigator.vibrate) navigator.vibrate(30);
             }
         }
@@ -344,11 +332,10 @@
         function startGame() {
             if (isRunning) return;
             
-            // Инициализируем звук ПРЯМО СЕЙЧАС (по клику пользователя)
-            initAudio();
-            if(bgMusic) bgMusic.play().catch(e => console.log("Music blocked"));
-
-            document.getElementById('start-overlay').style.display = 'none';
+            // ПРИНУДИТЕЛЬНЫЙ ЗАПУСК АУДИОКОНТЕКСТА НА СТАРТОВОЙ КНОПКЕ
+            initAudio(); 
+            
+            startOverlay.style.display = 'none';
             isRunning = true;
 
             countdownId = setInterval(() => {
@@ -363,24 +350,20 @@
         function loop() {
             if (!isRunning) return;
 
-            // Баланс физики
             if (isAddingHeat) {
                 heat += 1.8; 
             } else {
                 heat -= 1.0; 
             }
 
-            // Ограничители
             if (heat > 100) heat = 100;
             if (heat < 0) heat = 0;
 
-            // Отрисовка градусника
             mercury.style.height = heat + '%';
-            if (heat > 90 || heat < 10) mercury.style.background = '#e74c3c'; // Красный
-            else if (heat >= 30 && heat <= 70) mercury.style.background = 'linear-gradient(to top, #4caf50, #8bc34a)'; // Зеленый
+            if (heat > 90 || heat < 10) mercury.style.background = '#e74c3c'; 
+            else if (heat >= 30 && heat <= 70) mercury.style.background = 'linear-gradient(to top, #4caf50, #8bc34a)'; 
             else mercury.style.background = 'linear-gradient(to top, #3498db, #e74c3c)';
 
-            // Подсчет
             if (heat >= 30 && heat <= 70) {
                 scoreTime += 0.016; 
                 document.getElementById('green-zone').style.background = 'rgba(76, 175, 80, 0.7)';
@@ -416,16 +399,22 @@
 
         // --- УПРАВЛЕНИЕ (TOUCH EVENTS) ---
         const startHeat = (e) => {
-            // Предотвращаем стандартное поведение (скролл, зум)
             if(e.cancelable) e.preventDefault();
             
             if (!isRunning) return;
+            
+            // ПОПЫТКА ЗАПУСТИТЬ ФОНОВУЮ МУЗЫКУ ЗДЕСЬ (НА КНОПКЕ)
+            if (!bgMusicPlayed) {
+                if(bgMusic) bgMusic.play().catch(e => console.log("BG Music still blocked"));
+                bgMusicPlayed = true;
+            }
+
             isAddingHeat = true;
             btn.style.transform = "scale(0.95)";
             
             playSteamSound();
             createSteamBurst();
-            triggerVibration(); // Вызов умной вибрации
+            triggerVibration(); 
         };
 
         const stopHeat = (e) => {
@@ -435,22 +424,23 @@
             stopSteamSound();
         };
 
-        // Слушатели событий (важно для мобильных)
+        // Слушатели событий
+        startButton.addEventListener('click', startGame);
+
         btn.addEventListener('mousedown', startHeat);
-        btn.addEventListener('touchstart', startHeat, {passive: false}); // passive: false важно для iOS
+        btn.addEventListener('touchstart', startHeat, {passive: false}); 
         
         btn.addEventListener('mouseup', stopHeat);
         btn.addEventListener('touchend', stopHeat, {passive: false});
         btn.addEventListener('mouseleave', stopHeat);
 
-        // --- ГЕНЕРАЦИЯ ПАРА (ШИРОКИЙ РАЗЛЕТ) ---
+        // --- ГЕНЕРАЦИЯ ПАРА ---
         function createSteamBurst() {
             for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
                     const burst = document.createElement('div');
                     burst.classList.add('steam-burst');
                     
-                    // ШИРОКИЙ РАЗБРОС: от -150px до +150px
                     const randomX = (Math.random() * 300 - 150); 
                     burst.style.setProperty('--x', randomX + 'px');
                     
@@ -466,7 +456,6 @@
             }
         }
 
-        // --- ПЕРЕХОД В БОТА ---
         function goToBot(type) {
             const keyword = encodeURIComponent('баня');
             // ВАЖНО: Замените ID группы на свой!
