@@ -11,12 +11,12 @@
         
         body {
             background-color: #2b1d16;
-            background-image: repeating-linear-gradient(90deg, #3e2723 0, #3e2723 20px, #2b1d16 20px, #2b1d16 40px);
             color: #fff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
             touch-action: manipulation;
             height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -24,49 +24,61 @@
             position: relative;
         }
 
-        /* Фон бани */
+        /* Фон бани (Встроенный SVG для надежности) */
         #banya-interior {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            /* Используем внешнюю картинку. Для надежности лучше потом перевести в Base64 */
-            background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8)), 
-                        url('https://images.pexels.com/photos/27972232/pexels-photo-27972232/free-photo-of-a-wooden-sauna-with-logs-and-benches.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') center / cover no-repeat;
-            opacity: 0.9;
+            /* Темный градиент + текстура дерева */
+            background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8)),
+                        repeating-linear-gradient(90deg, #3e2723 0, #3e2723 40px, #2b1d16 40px, #2b1d16 80px);
             z-index: 0;
-            filter: brightness(0.8);
+        }
+        
+        /* Печь и полки (Рисуем CSS/SVG, чтобы не зависеть от картинок) */
+        #banya-interior::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 40%;
+            background: linear-gradient(to right, #4e342e 0%, #3e2723 100%);
+            border-top: 10px solid #5d4037;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
         }
 
-        /* Девушка на полке */
+        /* Девушка (SVG ВСТРОЕН В КОД - ГАРАНТИЯ ОТОБРАЖЕНИЯ) */
         #banya-girl {
             position: absolute;
-            bottom: 20%; 
+            bottom: 15%; 
             left: 50%;
             transform: translateX(-50%);
-            width: 250px; /* Немного увеличил размер */
-            height: 150px; 
-            background: url('https://images.pexels.com/photos/34097622/pexels-photo-34097622.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1') center / contain no-repeat;
-            opacity: 0.8;
-            z-index: 0;
-            pointer-events: none; /* Чтобы клики проходили сквозь картинку */
+            width: 300px;
+            height: 200px;
+            /* Силуэт девушки лежащей на полке */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 150'%3E%3Cpath fill='%23d7ccc8' d='M20,130 Q50,110 80,120 Q110,130 140,115 Q170,100 220,110 Q260,120 280,140 L280,150 L20,150 Z' opacity='0.9'/%3E%3Ccircle cx='250' cy='100' r='15' fill='%23d7ccc8' opacity='0.9'/%3E%3Cpath fill='%23ef5350' d='M70,120 Q100,125 130,115 L135,125 Q100,140 70,130 Z' opacity='0.8' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center bottom;
+            background-size: contain;
+            opacity: 0.9;
+            z-index: 1;
+            pointer-events: none;
         }
 
-        /* Фоновый туман */
+        /* Фоновый пар */
         .steam-bg {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
-            animation: pulseSteam 4s infinite alternate;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%);
+            animation: pulseSteam 5s infinite alternate;
             pointer-events: none;
-            z-index: 1;
+            z-index: 2;
         }
         @keyframes pulseSteam {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.6; transform: scale(1.1); }
+            0% { opacity: 0.2; transform: scale(1); }
+            100% { opacity: 0.4; transform: scale(1.1); }
         }
 
-        /* UI Игры */
+        /* Интерфейс */
         #game-ui {
-            z-index: 2;
+            z-index: 5;
             text-align: center;
             width: 100%;
             max-width: 500px;
@@ -81,50 +93,50 @@
         #timer-box {
             font-size: 24px;
             color: #ffcc80;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-top: 20px;
-            background: rgba(0,0,0,0.5);
-            padding: 10px 30px;
-            border-radius: 20px;
-            border: 1px solid #8d6e63;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            margin-top: 40px; /* Отступ сверху для челки телефона */
+            background: rgba(0,0,0,0.6);
+            padding: 5px 20px;
+            border-radius: 15px;
         }
         #timer { font-size: 48px; font-weight: bold; color: #fff; display: block; }
 
         /* Градусник */
         #thermometer-container {
             width: 60px;
-            height: 300px;
-            background: #4e342e;
+            height: 40%; /* Адаптивная высота */
+            max-height: 350px;
+            background: #3e2723;
             border-radius: 30px;
             border: 4px solid #8d6e63;
             position: relative;
-            margin: 20px 0;
+            margin: 10px 0;
             overflow: hidden;
-            box-shadow: inset 0 0 20px #000;
+            box-shadow: 0 0 15px rgba(0,0,0,0.8);
         }
 
         #green-zone {
             position: absolute;
             bottom: 30%; height: 40%; width: 100%;
-            background: rgba(76, 175, 80, 0.4);
+            background: rgba(76, 175, 80, 0.5);
             border-top: 2px dashed #4caf50;
             border-bottom: 2px dashed #4caf50;
             z-index: 1;
         }
         #green-zone::after {
-            content: "ИДЕАЛЬНО";
+            content: "НОРМА";
             position: absolute;
-            right: -60px; top: 40%;
-            transform: rotate(-90deg);
-            font-size: 12px;
-            color: #81c784;
+            right: -13px; top: 50%;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: 10px;
+            color: #fff;
             font-weight: bold;
+            letter-spacing: 1px;
         }
 
         #mercury {
             width: 100%;
-            background: linear-gradient(to top, #3498db, #e74c3c);
+            background: linear-gradient(to top, #2980b9, #e74c3c);
             position: absolute;
             bottom: 0; left: 0; height: 0%;
             transition: height 0.1s linear;
@@ -133,85 +145,68 @@
 
         /* Кнопка */
         #btn {
-            width: 140px;
-            height: 140px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
-            background: radial-gradient(circle, #d84315 0%, #bf360c 100%);
-            border: 6px solid #ffab91;
+            background: radial-gradient(circle, #ff5722 0%, #bf360c 100%);
+            border: 5px solid #ffab91;
             color: white;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             text-transform: uppercase;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             cursor: pointer;
             outline: none;
             user-select: none;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             position: relative;
-            /* Убрали overflow: hidden, чтобы пар вылетал за пределы кнопки */
-            transition: transform 0.1s;
+            z-index: 6;
+            touch-action: none; /* Важно для мобильных */
+            transition: transform 0.05s;
         }
-        #btn:active { transform: scale(0.95); background: #a62a0a; }
+        #btn:active { transform: scale(0.92); filter: brightness(1.1); }
 
-        /* СТИЛЬ ПАРА */
+        /* СТИЛЬ ПАРА (ИСПРАВЛЕН РАЗЛЕТ) */
         .steam-burst {
             position: absolute;
-            bottom: 50%;
+            bottom: 60%;
             left: 50%;
-            /* Начальные размеры, переопределяются в JS */
             width: 80px; 
             height: 80px;
-            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 70%);
             border-radius: 50%;
-            transform: translate(-50%, 0) scale(0.2);
-            animation: burstFadeOut 2s forwards;
+            transform: translate(-50%, 0) scale(0.1);
+            animation: burstFadeOut 1.5s forwards;
             pointer-events: none;
-            z-index: 10; /* Поверх кнопки */
-            --x: 0px; /* CSS переменная для смещения */
+            z-index: 4; /* Под кнопкой, но над фоном */
+            --x: 0px; 
         }
         
         @keyframes burstFadeOut {
-            0% { transform: translate(-50%, 0) scale(0.2); opacity: 0.8; }
-            100% { transform: translate(calc(-50% + var(--x)), -250px) scale(2.5); opacity: 0; }
+            0% { transform: translate(-50%, 0) scale(0.2); opacity: 0.9; }
+            100% { transform: translate(calc(-50% + var(--x)), -350px) scale(3); opacity: 0; }
         }
 
-        /* Результат */
-        #result-screen {
+        /* Оверлеи (Старт и Результат) */
+        #start-overlay, #result-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(20, 10, 5, 0.95);
-            z-index: 10;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        .result-title { font-size: 32px; color: #ffab91; margin-bottom: 10px; }
-        .result-score { font-size: 18px; color: #ccc; margin-bottom: 30px; }
-        
-        .action-btn {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            font-size: 18px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 320px;
-            margin: 10px 0;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-income { background: #f57c00; }
-
-        #start-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 20;
+            background: rgba(0,0,0,0.9); 
+            z-index: 50;
             display: flex; align-items: center; justify-content: center;
             flex-direction: column; text-align: center; padding: 20px;
         }
+        
+        #result-screen { display: none; }
+
+        .action-btn {
+            background: #2e7d32;
+            color: white; border: none;
+            padding: 15px 20px; font-size: 18px;
+            border-radius: 12px; width: 100%; max-width: 300px;
+            margin: 10px 0; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .btn-income { background: #f57c00; }
     </style>
 </head>
 <body>
@@ -225,15 +220,14 @@
     <div class="steam-bg"></div>
 
     <div id="start-overlay" onclick="startGame()">
-        <p style="color:#eee; margin-bottom:5px; font-size:20px;">ВИРТУАЛЬНАЯ ПАРНАЯ</p>
-        <h1 style="color:#ffab91; margin-bottom:20px;">🔥 ЧЕЛЛЕНДЖ 90°C</h1>
-        <p style="font-size:18px; line-height:1.5; color:#fff;">
-            Удерживай пар в <b>ЗЕЛЕНОЙ ЗОНЕ</b>.<br>
-            Нажимай кнопку, чтобы поддать жару.<br>
-            Отпускай, чтобы остудить.
+        <p style="color:#bbb; font-size:16px; letter-spacing: 2px;">ВИРТУАЛЬНАЯ ПАРНАЯ</p>
+        <h1 style="color:#ffab91; font-size:36px; margin: 10px 0 30px;">🔥 ЧЕЛЛЕНДЖ 90°C</h1>
+        <p style="color:#fff; font-size:18px; line-height: 1.6; max-width: 300px;">
+            Твоя задача — удержать температуру в <b>ЗЕЛЕНОЙ ЗОНЕ</b>.<br><br>
+            Жми кнопку, чтобы поддать жару!
         </p>
-        <div style="margin-top:30px; font-size:24px; color:#4caf50; animation: pulseSteam 1s infinite;">
-            НАЖМИ, ЧТОБЫ НАЧАТЬ
+        <div style="margin-top:40px; color:#4caf50; font-weight:bold; font-size:20px; animation: pulseSteam 1s infinite;">
+            КОСНИСЬ ЭКРАНА, ЧТОБЫ НАЧАТЬ
         </div>
     </div>
 
@@ -249,11 +243,11 @@
     </div>
 
     <div id="result-screen">
-        <div class="result-title" id="res-title">Результат</div>
-        <div class="result-score" id="res-desc">...</div>
+        <h2 style="color:#ffab91; font-size:32px; margin-bottom:10px;" id="res-title">Результат</h2>
+        <p style="color:#ccc; font-size:16px; margin-bottom:30px; max-width:300px;" id="res-desc">...</p>
         
         <button class="action-btn" onclick="goToBot('health')">
-            🎁 Получить урок по парению
+            🎁 Забрать урок: Секреты Пара
         </button>
         <button class="action-btn btn-income" onclick="goToBot('income')">
             💰 Узнать, как на этом заработать
@@ -261,6 +255,12 @@
     </div>
 
     <script>
+        // Инициализация VK Bridge (для вибрации и работы в приложении)
+        const bridge = window.vkBridge;
+        if(bridge) {
+            bridge.send('VKWebAppInit');
+        }
+
         // --- ПЕРЕМЕННЫЕ ---
         const mercury = document.getElementById('mercury');
         const timerEl = document.getElementById('timer');
@@ -274,35 +274,50 @@
         let scoreTime = 0; 
         let countdownId;
 
-        // --- АУДИО (Генератор шума) ---
+        // --- АУДИО КОНТЕКСТ (Шум пара) ---
         let audioCtx;
         let noiseNode;
         let gainNode;
 
+        // Создаем аудио контекст (для мобильных важно создавать его внутри функции)
         function initAudio() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-            
-            const bufferSize = audioCtx.sampleRate * 2;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = Math.random() * 2 - 1;
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!audioCtx) {
+                    audioCtx = new AudioContext();
+                }
+                
+                // Если контекст "спит" (обычно на iOS), будим его
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                if (!noiseNode) {
+                    const bufferSize = audioCtx.sampleRate * 2;
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+
+                    noiseNode = audioCtx.createBufferSource();
+                    noiseNode.buffer = buffer;
+                    noiseNode.loop = true;
+                    
+                    gainNode = audioCtx.createGain();
+                    gainNode.gain.value = 0;
+
+                    noiseNode.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    noiseNode.start();
+                }
+            } catch (e) {
+                console.log("Audio init failed:", e);
             }
-
-            noiseNode = audioCtx.createBufferSource();
-            noiseNode.buffer = buffer;
-            noiseNode.loop = true;
-            
-            gainNode = audioCtx.createGain();
-            gainNode.gain.value = 0;
-
-            noiseNode.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            noiseNode.start();
         }
 
         function playSteamSound() {
+            if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
             if(gainNode) gainNode.gain.setTargetAtTime(0.3, audioCtx.currentTime, 0.05);
         }
 
@@ -310,15 +325,31 @@
             if(gainNode) gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
         }
 
+        // --- ВИБРАЦИЯ (УНИВЕРСАЛЬНАЯ) ---
+        function triggerVibration() {
+            // 1. Пробуем нативную вибрацию VK (для iOS/Android внутри ВК)
+            if (bridge) {
+                bridge.send("VKWebAppTapticImpactOccurred", {"style": "medium"})
+                    .catch(() => {
+                        // Если не сработало, пробуем обычную вибрацию браузера
+                        if (navigator.vibrate) navigator.vibrate(30);
+                    });
+            } else {
+                // Если мы не в ВК, просто вибрируем
+                if (navigator.vibrate) navigator.vibrate(30);
+            }
+        }
+
         // --- ЛОГИКА ИГРЫ ---
         function startGame() {
             if (isRunning) return;
+            
+            // Инициализируем звук ПРЯМО СЕЙЧАС (по клику пользователя)
+            initAudio();
+            if(bgMusic) bgMusic.play().catch(e => console.log("Music blocked"));
+
             document.getElementById('start-overlay').style.display = 'none';
             isRunning = true;
-            
-            initAudio(); 
-            bgMusic.volume = 0.4;
-            bgMusic.play().catch(console.log);
 
             countdownId = setInterval(() => {
                 timeLeft--;
@@ -332,26 +363,29 @@
         function loop() {
             if (!isRunning) return;
 
+            // Баланс физики
             if (isAddingHeat) {
                 heat += 1.8; 
             } else {
                 heat -= 1.0; 
             }
 
+            // Ограничители
             if (heat > 100) heat = 100;
             if (heat < 0) heat = 0;
 
+            // Отрисовка градусника
             mercury.style.height = heat + '%';
-
-            if (heat > 90 || heat < 10) mercury.style.background = '#ff0000';
-            else if (heat >= 30 && heat <= 70) mercury.style.background = 'linear-gradient(to top, #4caf50, #8bc34a)';
+            if (heat > 90 || heat < 10) mercury.style.background = '#e74c3c'; // Красный
+            else if (heat >= 30 && heat <= 70) mercury.style.background = 'linear-gradient(to top, #4caf50, #8bc34a)'; // Зеленый
             else mercury.style.background = 'linear-gradient(to top, #3498db, #e74c3c)';
 
+            // Подсчет
             if (heat >= 30 && heat <= 70) {
                 scoreTime += 0.016; 
-                document.getElementById('green-zone').style.background = 'rgba(76, 175, 80, 0.6)';
+                document.getElementById('green-zone').style.background = 'rgba(76, 175, 80, 0.7)';
             } else {
-                document.getElementById('green-zone').style.background = 'rgba(76, 175, 80, 0.2)';
+                document.getElementById('green-zone').style.background = 'rgba(76, 175, 80, 0.3)';
             }
             requestAnimationFrame(loop);
         }
@@ -365,14 +399,14 @@
             const percent = Math.round((scoreTime / 30) * 100);
             
             let title, desc;
-            if (percent > 85) {
-                title = "🔥 БОГ ПАРА! 🔥";
-                desc = `Ты удержал идеальный пар ${percent}% времени. Это уровень Профи!`;
-            } else if (percent > 60) {
-                title = "👍 Хороший результат";
-                desc = `Твой результат ${percent}%. Неплохо, но есть ошибки.`;
+            if (percent > 80) {
+                title = "🔥 ТЫ ПАРМЕЙСТЕР!";
+                desc = `Идеальный пар ${percent}% времени. Это уровень Профи!`;
+            } else if (percent > 50) {
+                title = "👍 ХОРОШО";
+                desc = `Твой результат ${percent}%. Неплохо, но можно лучше.`;
             } else {
-                title = "❄️ Холодно...";
+                title = "❄️ ХОЛОДНО...";
                 desc = `Всего ${percent}%. Пар нестабилен. Нужна техника.`;
             }
             document.getElementById('res-title').innerText = title;
@@ -380,15 +414,18 @@
             document.getElementById('result-screen').style.display = 'flex';
         }
 
-        // --- УПРАВЛЕНИЕ ---
+        // --- УПРАВЛЕНИЕ (TOUCH EVENTS) ---
         const startHeat = (e) => {
+            // Предотвращаем стандартное поведение (скролл, зум)
             if(e.cancelable) e.preventDefault();
+            
             if (!isRunning) return;
             isAddingHeat = true;
             btn.style.transform = "scale(0.95)";
+            
             playSteamSound();
-            createSteamBurst(); // МНОГО ПАРА
-            if (navigator.vibrate) navigator.vibrate(30);
+            createSteamBurst();
+            triggerVibration(); // Вызов умной вибрации
         };
 
         const stopHeat = (e) => {
@@ -398,49 +435,44 @@
             stopSteamSound();
         };
 
+        // Слушатели событий (важно для мобильных)
         btn.addEventListener('mousedown', startHeat);
-        btn.addEventListener('touchstart', startHeat);
+        btn.addEventListener('touchstart', startHeat, {passive: false}); // passive: false важно для iOS
+        
         btn.addEventListener('mouseup', stopHeat);
-        btn.addEventListener('touchend', stopHeat);
+        btn.addEventListener('touchend', stopHeat, {passive: false});
         btn.addEventListener('mouseleave', stopHeat);
 
-        // --- ГЕНЕРАЦИЯ ПАРА (ИСПРАВЛЕНО) ---
+        // --- ГЕНЕРАЦИЯ ПАРА (ШИРОКИЙ РАЗЛЕТ) ---
         function createSteamBurst() {
-            // Создаем 15 облачков вместо 10 для густоты
             for (let i = 0; i < 15; i++) {
                 setTimeout(() => {
                     const burst = document.createElement('div');
                     burst.classList.add('steam-burst');
                     
-                    // ВАЖНОЕ ИСПРАВЛЕНИЕ: Используем setProperty для CSS переменной
-                    // Разброс от -50px до +50px
-                    const randomX = (Math.random() * 100 - 50); 
+                    // ШИРОКИЙ РАЗБРОС: от -150px до +150px
+                    const randomX = (Math.random() * 300 - 150); 
                     burst.style.setProperty('--x', randomX + 'px');
                     
-                    // Рандомный размер облачка (от 60px до 120px)
-                    const size = 60 + Math.random() * 60;
+                    const size = 60 + Math.random() * 80;
                     burst.style.width = size + 'px';
                     burst.style.height = size + 'px';
-                    
-                    // Рандомная длительность анимации
-                    burst.style.animationDuration = (1 + Math.random()) + 's';
+                    burst.style.animationDuration = (0.8 + Math.random()) + 's';
 
                     btn.appendChild(burst);
                     
-                    burst.addEventListener('animationend', () => {
-                        burst.remove();
-                    });
-                }, i * 30); // Задержка 30мс для эффекта очереди
+                    burst.addEventListener('animationend', () => { burst.remove(); });
+                }, i * 20);
             }
         }
 
+        // --- ПЕРЕХОД В БОТА ---
         function goToBot(type) {
             const keyword = encodeURIComponent('баня');
+            // ВАЖНО: Замените ID группы на свой!
             const link = `https://vk.me/club81910950?ref=${keyword}`;
             window.location.href = link;
         }
-
-        if(vkBridge) vkBridge.send('VKWebAppInit');
     </script>
 </body>
 </html>
